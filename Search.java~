@@ -592,7 +592,7 @@ class Search {
       if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
         zzAtEOF = true;
               {
-                System.out.println("Found "+cualquiercosa+" numbers."); return 0;
+                System.out.println("Found "+cualquiercosa+" numbers."); yyterminate();
               }
       }
       else {
