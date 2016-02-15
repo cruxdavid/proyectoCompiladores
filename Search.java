@@ -34,8 +34,9 @@ class Search {
    * Translates characters to character classes
    */
   private static final String ZZ_CMAP_PACKED = 
-    "\12\0\1\0\1\2\1\2\1\2\42\0\12\1\113\0\1\2\u1fa2\0"+
-    "\1\2\1\2\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\udfe6\0";
+    "\11\0\1\11\1\3\1\4\1\5\1\4\22\0\1\11\16\0\1\6"+
+    "\12\1\7\0\32\7\4\0\1\2\1\0\32\10\12\0\1\4\u1fa2\0"+
+    "\1\4\1\4\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\udfe6\0";
 
   /** 
    * Translates characters to character classes
@@ -48,10 +49,12 @@ class Search {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\1\0\1\1\1\2\1\3";
+    "\1\0\1\1\1\2\1\3\1\1\1\0\1\2\1\0"+
+    "\1\4\1\0\1\2\2\0\1\2\2\0\1\2\1\4"+
+    "\5\0\1\4\2\0\1\5\1\0\1\4";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[4];
+    int [] result = new int[29];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -76,10 +79,13 @@ class Search {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\3\0\6\0\3";
+    "\0\0\0\12\0\24\0\12\0\36\0\50\0\62\0\74"+
+    "\0\106\0\120\0\132\0\144\0\156\0\12\0\170\0\202"+
+    "\0\214\0\226\0\240\0\252\0\264\0\276\0\310\0\322"+
+    "\0\334\0\346\0\12\0\360\0\360";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[4];
+    int [] result = new int[29];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -102,10 +108,19 @@ class Search {
   private static final int [] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\2\1\3\1\4\4\0\1\3\1\0";
+    "\1\2\1\3\2\2\2\4\1\2\1\5\2\2\12\0"+
+    "\1\6\1\7\1\10\3\0\4\6\10\0\1\11\2\0"+
+    "\1\12\10\0\1\6\1\13\1\10\3\0\1\14\3\6"+
+    "\1\0\1\13\15\0\1\15\2\0\1\11\1\15\1\0"+
+    "\1\16\10\0\1\6\1\13\1\10\3\0\4\6\1\0"+
+    "\1\17\17\0\1\20\3\0\1\21\20\0\1\22\7\0"+
+    "\1\23\10\0\1\24\2\0\1\22\1\24\1\0\1\25"+
+    "\17\0\1\26\3\0\1\27\20\0\1\30\2\0\1\31"+
+    "\15\0\1\32\2\0\1\30\1\32\1\0\1\33\17\0"+
+    "\1\34\12\0\1\35\1\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[9];
+    int [] result = new int[250];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -143,10 +158,12 @@ class Search {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\11\1\1\1\11";
+    "\1\0\1\11\1\1\1\11\1\1\1\0\1\1\1\0"+
+    "\1\1\1\0\1\1\2\0\1\11\2\0\2\1\5\0"+
+    "\1\1\2\0\1\11\1\0\1\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[4];
+    int [] result = new int[29];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -245,7 +262,7 @@ class Search {
     char [] map = new char[0x110000];
     int i = 0;  /* index in packed string  */
     int j = 0;  /* index in unpacked array */
-    while (i < 58) {
+    while (i < 78) {
       int  count = packed.charAt(i++);
       char value = packed.charAt(i++);
       do map[j++] = value; while (--count > 0);
@@ -591,24 +608,30 @@ class Search {
 
       if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
         zzAtEOF = true;
-              {
-                System.out.println("Found "+cualquiercosa+" numbers."); return 0;
-              }
+        return YYEOF;
       }
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
             { /* do nothing */
             }
-          case 4: break;
+          case 6: break;
           case 2: 
-            { cualquiercosa++; System.out.printf("-> found number: %s at line %d, column %d\n ", yytext(), yyline, yycolumn);
+            { System.out.printf("Salario: %s\n ", yytext());
             }
-          case 5: break;
+          case 7: break;
           case 3: 
             { System.out.print(yytext());
             }
-          case 6: break;
+          case 8: break;
+          case 4: 
+            { System.out.printf("\nNombre: %s\n ", yytext());
+            }
+          case 9: break;
+          case 5: 
+            { System.out.printf("Fecha: %s\n ", yytext());
+            }
+          case 10: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }
