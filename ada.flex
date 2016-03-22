@@ -1,13 +1,17 @@
-import java_cup.runtime.*;
+import java_cup.runtime.Symbol;
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory.Location;
 import java.util.HashMap;
 import java.util.Map;
 %%
 %class Search
+%cup
+%implements sym, Parser.Constants
+%char
 %standalone
 %line
 %column
-%{
-      StringBuffer string = new StringBuffer();
+%{  
 
       private Symbol symbol(int type) {
         return new Symbol(type, yyline, yycolumn);
@@ -27,12 +31,15 @@ BASE                =    {INTEGER}
 BASED_INTEGER        =   {EXTENDED_DIGIT}(_?{EXTENDED_DIGIT})*
 BASED_LITERAL         =  {BASE}#{BASED_INTEGER}(\.{BASED_INTEGER})?#{EXPONENT}?
 %%
-{INTEGER} {System.out.printf("-> found number: %s at line %d, column %d\n ", yytext(), yyline, yycolumn);}
+{INTEGER} {System.out.printf("-> found number: %s at line %d, column %d\n ", yytext(), yyline, yycolumn); return symbol(sym.NUMERICLIT);}
 {DECIMAL_LITERAL} {System.out.printf("-> found decimal: %s at line %d, column %d\n ", yytext(), yyline, yycolumn);}
 [a-zA-Z](_?[a-zA-Z0-9])* {  count++;
 							if (keywords.containsKey(yytext().toUpperCase()))
-							{ System.out.println("-> found " + yytext().toUpperCase() + " at line "+yyline + ", column "+ yycolumn); }
-							else{ System.out.printf("-> found identifier: %s at line %d, column %d\n ", yytext(), yyline, yycolumn); }
+							{ System.out.println("-> found " + yytext().toUpperCase() + " at line "+yyline + ", column "+ yycolumn); return symbol(sym.IDENTIFIER);}
+							else if(yylength()==1){ return symbol(sym.CHARLIT); }
+              else{
+                  return symbol(sym.CHARSTRING);
+                }
 							}
 "."                     {return symbol(sym.DOT);}
 "<"                     {return symbol(sym.LESSTHAN);}
@@ -56,8 +63,8 @@ BASED_LITERAL         =  {BASE}#{BASED_INTEGER}(\.{BASED_INTEGER})?#{EXPONENT}?
 "<>"                    {return symbol(sym.BOX);}
 "<="                    {return symbol(sym.LEQ);}
 "**"                    {return symbol(sym.STARSTAR);}
-"/="                    {return symbol(sym.NOTEQUAL);}
-">="                    {return symbol(sym.GEQ);}
+"/="                    {return symbol(sym.NE);}
+">="                    {return symbol(sym.GE);}
 ":="                    {return symbol(sym.ASSIGN);}
 "=>"                    {return symbol(sym.ARROW);}
 "ABORT"                 { return symbol(sym.ABORT); }
