@@ -1,4 +1,3 @@
-/*Simple +/-/ expression language; parser evaluates constant expressions on the fly*/
 import java.io.*;
 import java_cup.runtime.*;
 import java.util.*;
@@ -28,32 +27,24 @@ parser code {:
 
 :}
 
-/* define how to connect to the scanner! */
-/*init with {: s.init(); :};
-scan with {: return s.next_token(); :};*/
-
-/* Terminals (tokens returned by the scanner). */
+// Terminales
 terminal            SUMSUBS,MULDIV,LPAR,RPAR,SEMICOLON,COMMA,DOTDOT,ABORT,AND,CASE,DIGITS,EXCEPTION,GOTO,LOOP,OF,RECORD,SELECT,THEN,WITH,ABS,ARRAY,CONSTANT,DO,EXIT,IF,MOD,OR,PRIVATE,REM,SEPARATE,TYPE,XOR,ACCEPT,AT,DECLARE,ELSE,FOR,IN,NEW,OTHERS,PROCEDURE,RENAMES,SUBTYPE,USE,ACCESS,BEGIN,DELAY,END,FUNCTION,IS,NOT,OUT,RAISE,RETURN,TASK,WHEN,ALL,BODY,DELTA,ENTRY,GENERIC,LIMITED,NULL,ELSIF,PACKAGE,RANGE,REVERSE,TERMINATE,WHILE,BOOLEAN,GET,PUT,IDENTIFIER,OPREL,ASSIGN,INTEGER,FLOAT;
 terminal Integer    NUM;        // our scanner provides numbers as integers
 terminal Double     REAL;
 
-/* Non terminals */
+//No terminales
 non terminal           procedure,sequence_of_statements,empty,arithmetic_expression,term,factor,statement,relation,
 					   boolean_operation,expression,assignment_statement,simple_statement,compound_statement,
 					   if_statement,condition,elsif,else,loop_statement,while_or_for,rest_of_loop,condition_part;
 
-/* Precedences */
+//Precedencias
 precedence left MULDIV;
 precedence left SUMSUBS;
 
-/* The grammar rules */
-
-
+//Gramaticas
 procedure ::= PROCEDURE IDENTIFIER IS BEGIN procedure END IDENTIFIER SEMICOLON
 			| PROCEDURE IDENTIFIER IS BEGIN sequence_of_statements procedure END IDENTIFIER SEMICOLON
 			| empty;
-
-/*Statements declarations*/
 
 sequence_of_statements ::= sequence_of_statements statement 
 		| statement;
@@ -63,8 +54,6 @@ statement ::= simple_statement | compound_statement;
 simple_statement ::= assignment_statement;
 
 compound_statement ::= if_statement | loop_statement;
-
-/*If statement*/
 
 if_statement ::= IF condition_part elsif else END IF SEMICOLON
                 |error;
@@ -77,35 +66,23 @@ condition_part ::= condition THEN sequence_of_statements;
 else ::=  ELSE sequence_of_statements
 		| empty;
 
-/*loop_statement*/
-
 loop_statement ::= while_or_for;
 
 while_or_for ::= WHILE condition rest_of_loop;
 
 rest_of_loop ::= LOOP sequence_of_statements END LOOP SEMICOLON;
 
-/*condition*/
-
 condition ::= expression;
 
-/*Assignment statement*/
-
 assignment_statement ::= IDENTIFIER ASSIGN expression SEMICOLON;
-
-/*Expression Grammar*/
 
 expression ::= expression boolean_operation relation
 			| relation;
 
 boolean_operation ::= AND|OR|XOR;
 
-/*Relation Grammar*/
-
 relation ::= arithmetic_expression OPREL arithmetic_expression
 			|arithmetic_expression; 
-
-/*Arithmetic Expressions */
 
 arithmetic_expression ::= arithmetic_expression SUMSUBS term
 			|term;
