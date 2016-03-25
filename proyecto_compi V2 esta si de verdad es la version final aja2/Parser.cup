@@ -11,18 +11,18 @@ parser code {:
             err++;
             int line = s.right;
             int column = s.left;
-            System.out.println("Error sintactico encontrado en linea: " + line + " Columna: " + column + " simbolo conflictivo: " + s.value);
+            System.out.println("Syntax error near line " + line + ", column " + column + "; found: " + s.value + ".");
 	}
 
 	public void unrecovered_syntax_error (Symbol s) throws java.lang.Exception
 	{
             err++;
-            System.out.println("ERROR FATAL, COMPILACION NO PUDO SER TERMINADA");
+            System.out.println("Could not recover from error.");
 	}
         
     public void PrintErrores()
     {
-        System.out.println( err +" ERRORES FUERON ENCONTRADOS!!");
+        System.out.println( err +" errors were found.");
     }
 
 :}
@@ -34,7 +34,7 @@ terminal Double     REAL;
 
 //No terminales
 non terminal           procedure,sequence_of_statements,empty,arithmetic_expression,term,factor,statement,relation,
-					   boolean_operation,expression,assignment_statement,simple_statement,compound_statement,
+					   boolean_operator,expression,assignment_statement,simple_statement,compound_statement,
 					   if_statement,condition,elsif,else,loop_statement,while_or_for,rest_of_loop,condition_part;
 
 //Precedencias
@@ -56,10 +56,11 @@ simple_statement ::= assignment_statement;
 compound_statement ::= if_statement | loop_statement;
 
 if_statement ::= IF condition_part elsif else END IF SEMICOLON
-                |error;
+                | error SEMICOLON  {: System.out.println("Error in if_statement declaration."); :}
+                ;
 
 elsif ::= elsif ELSIF condition_part
-		|empty;
+		| empty;
 
 condition_part ::= condition THEN sequence_of_statements;
 
@@ -74,15 +75,19 @@ rest_of_loop ::= LOOP sequence_of_statements END LOOP SEMICOLON;
 
 condition ::= expression;
 
-assignment_statement ::= IDENTIFIER ASSIGN expression SEMICOLON;
+assignment_statement ::= IDENTIFIER ASSIGN expression SEMICOLON
+			| error SEMICOLON {: System.out.println("Invalid assignment statement. Expected <id> ASSIGN <exp> ;"); :}
+			;
 
-expression ::= expression boolean_operation relation
+expression ::= expression boolean_operator relation
 			| relation;
 
-boolean_operation ::= AND|OR|XOR;
+boolean_operator ::= AND|OR|XOR;
 
 relation ::= arithmetic_expression OPREL arithmetic_expression
-			|arithmetic_expression; 
+			|arithmetic_expression
+			| error {: System.out.println("Invalid boolean operation. Expected expression OPREL expression."); :}
+			; 
 
 arithmetic_expression ::= arithmetic_expression SUMSUBS term
 			|term;
@@ -93,6 +98,8 @@ term ::= term MULDIV factor
 factor ::=  IDENTIFIER
 		  | NUM
 		  | REAL
-		  | LPAR arithmetic_expression RPAR;
+		  | LPAR arithmetic_expression RPAR
+		  | error {: System.out.println("Expected NUM, REAL, or arithmetic_expression."); :}
+		  ;
 
 empty ::= /* nothing */;
