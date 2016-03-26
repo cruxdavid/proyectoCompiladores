@@ -1,35 +1,49 @@
 import java.io.*;
-import java_cup.runtime.*;
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ScannerBuffer;
+import java_cup.runtime.XMLElement;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.*;
 import java.util.*;
 import java.lang.*;
 
 parser code {:
-	
-        int err = 0;
-	public void syntax_error (Symbol s)
-	{
-            err++;
-            int line = s.right;
-            int column = s.left;
-            System.out.println("Error sintactico encontrado en linea: " + line + " Columna: " + column + " simbolo conflictivo: " + s.value);
+
+	public Parser(Lexer lex, ComplexSymbolFactory sf){
+		super(lex,sf);
 	}
 
-	public void unrecovered_syntax_error (Symbol s) throws java.lang.Exception
-	{
-            err++;
-            System.out.println("ERROR FATAL, COMPILACION NO PUDO SER TERMINADA");
-	}
-        
-    public void PrintErrores()
-    {
-        System.out.println( err +" ERRORES FUERON ENCONTRADOS!!");
-    }
+	public static void main(String[] args) throws Exception{
 
+		ComplexSymbolFactory csf = new ComplexSymbolFactory();
+		Reader rscanner;
+		rscanner = new BufferedReader(new FileReader("source.txt"));
+		ScannerBuffer lexer = new ScannerBuffer(new Lexer(rscanner,csf));
+
+		Parser p = new Parser(lexer,csf);
+		XMLElement e = (XMLElement)p.parse().value;
+
+		XMLOutputFactory outFactory = XMLOutputFactory.newInstance();
+		XMLStreamWriter sw = outFactory.createXMLStreamWriter(new FileOutputStream("outStream.xml"));
+		XMLElement.dump(lexer,sw,e,"expr","stmt");
+
+		Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("tree.xsl")));
+
+		Source text = new StreamSource(new File("outStream.xml"));
+		transformer.transform(text, new StreamResult(new File("output.xml")));
+		transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("tree-view.xsl")));
+
+		text = new StreamSource(new File("output.xml"));
+		transformer.transform(text, new StreamResult(new File("ast.html")));
+
+	}
 :}
 
 // Terminales
 terminal            SUMSUBS,MULDIV,LPAR,RPAR,SEMICOLON,COMMA,DOTDOT,ABORT,AND,CASE,DIGITS,EXCEPTION,GOTO,LOOP,OF,RECORD,SELECT,THEN,WITH,ABS,ARRAY,CONSTANT,DO,EXIT,IF,MOD,OR,PRIVATE,REM,SEPARATE,TYPE,XOR,ACCEPT,AT,DECLARE,ELSE,FOR,IN,NEW,OTHERS,PROCEDURE,RENAMES,SUBTYPE,USE,ACCESS,BEGIN,DELAY,END,FUNCTION,IS,NOT,OUT,RAISE,RETURN,TASK,WHEN,ALL,BODY,DELTA,ENTRY,GENERIC,LIMITED,NULL,ELSIF,PACKAGE,RANGE,REVERSE,TERMINATE,WHILE,BOOLEAN,GET,PUT,IDENTIFIER,OPREL,ASSIGN,INTEGER,FLOAT;
-terminal Integer    NUM;        // our scanner provides numbers as integers
+terminal Integer    NUM;      
 terminal Double     REAL;
 
 //No terminales

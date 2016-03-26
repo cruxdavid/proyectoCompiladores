@@ -1,27 +1,27 @@
-procedure A_Test is
-begin
-   procedure XY is
-   begin
-   ABC := 3 + 90 and JK;
-   ABC := 3 + 90 and JK;
-   if A and B then
-	ABC := 3 + 90 and JK;
-   elsif A or C then
-	ABC := 3 + 90 and JK;
-   elsif A or C then
-	if A and B then
-	   ABC := 3 + 90 and JK;
-   	else
-	   ABC := 3 + 90 and JK;
-        end if;
-   else
-	ABC := 3 + 90 and JK;
-   end if;
-   while A > B loop
-	ABC := 3 + 90 and JK;
-	    while A > B loop
-		ABC := 3 + 90 and JK;
-            end loop;
-   end loop;
-  end XY;
-end A_Test;
+PROCEDURE A_Test IS
+BEGIN
+   PROCEDURE XY IS
+   BEGIN
+   ABC := 3 + 90 AND JK;
+   ABC := 3 + 90 AND JK;
+   IF A AND B THEN
+	ABC := 3 + 90 AND JK;
+   ELSIF A OR C THEN
+	ABC := 3 + 90 AND JK;
+   ELSIF A OR C THEN
+	IF A AND B THEN
+	   ABC := 3 + 90 AND JK;
+   	ELSE
+	   ABC := 3 + 90 AND JK;
+        END IF;
+   ELSE
+	ABC := 3 + 90 AND JK;
+   END IF;
+   WHILE A > B LOOP
+	ABC := 3 + 90 AND JK;
+	    while A > B LOOP
+		ABC := 3 + 90 AND JK;
+            END LOOP;
+   END LOOP;
+  END XY;
+END A_Test;

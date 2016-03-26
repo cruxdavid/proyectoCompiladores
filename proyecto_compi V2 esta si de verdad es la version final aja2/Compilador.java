@@ -15,8 +15,8 @@ public class Compilador {
     public static void main(String[] args) {
         Reader scanner;
         try {
-            scanner = new BufferedReader(new FileReader("source.txt"));
-            Search lexer = new Search(scanner);
+            scanner = new BufferedReader(new FileReader(args[0]));
+            Lexer lexer = new Lexer(scanner);
             Parser parser = new Parser(lexer);
             parser.parse();
         } catch (FileNotFoundException ex) {
