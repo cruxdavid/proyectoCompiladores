@@ -25,6 +25,20 @@ parser code {:
         System.out.println( err +" errors were found.");
     }
 
+    public void report_error(String message, Object info) {
+    if (info instanceof String){
+	err++; 
+      System.err.println("  "+ errors + "==> " + info + " "+ message+".");
+    }
+    else {
+    	StringBuffer m = new StringBuffer("Error ");
+    	if (info instanceof java_cup.runtime.Symbol) 
+     	   m.append( "("+info.toString()+")" );     
+    	m.append(" : "+message);   
+    	System.err.println(m);
+     }
+   }
+
 :}
 
 // Terminales
@@ -56,7 +70,7 @@ simple_statement ::= assignment_statement;
 compound_statement ::= if_statement | loop_statement;
 
 if_statement ::= IF condition_part elsif else END IF SEMICOLON
-                | error SEMICOLON  {: System.out.println("Error in if_statement declaration."); :}
+                | error {: parser.report_error("if_statement","WRONG"); :}
                 ;
 
 elsif ::= elsif ELSIF condition_part
@@ -76,7 +90,7 @@ rest_of_loop ::= LOOP sequence_of_statements END LOOP SEMICOLON;
 condition ::= expression;
 
 assignment_statement ::= IDENTIFIER ASSIGN expression SEMICOLON
-			| error SEMICOLON {: System.out.println("Invalid assignment statement. Expected <id> ASSIGN <exp> ;"); :}
+			| IDENTIFIER ASSIGN error SEMICOLON {: parser.report_error("assignment_statement","WRONG"); :}
 			;
 
 expression ::= expression boolean_operator relation
@@ -86,20 +100,20 @@ boolean_operator ::= AND|OR|XOR;
 
 relation ::= arithmetic_expression OPREL arithmetic_expression
 			|arithmetic_expression
-			| error {: System.out.println("Invalid boolean operation. Expected expression OPREL expression."); :}
+			|arithmetic_expression error arithmetic_expression {: parser.report_error("relation, expected OPREL","WRONG"); :}
 			; 
 
 arithmetic_expression ::= arithmetic_expression SUMSUBS term
 			|term;
 
 term ::= term MULDIV factor
-		|factor;
+		|factor
+		;
 
 factor ::=  IDENTIFIER
 		  | NUM
 		  | REAL
 		  | LPAR arithmetic_expression RPAR
-		  | error {: System.out.println("Expected NUM, REAL, or arithmetic_expression."); :}
 		  ;
 
 empty ::= /* nothing */;
