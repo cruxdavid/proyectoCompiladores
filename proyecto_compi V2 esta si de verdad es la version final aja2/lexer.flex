@@ -1,12 +1,54 @@
 import java_cup.runtime.Symbol;
-
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory.Location;
 %%
-%class Search
+%public
+%class Lexer
 %cup
-%unicode
+%implements sym
+%char
 %int
 %line
 %column
+%{
+    StringBuffer string = new StringBuffer();
+    ComplexSymbolFactory symbolFactory;
+    public Lexer(java.io.Reader in, ComplexSymbolFactory sf){
+        this(in);
+        symbolFactory = sf;
+    }
+    
+
+    private Symbol symbol(String name, int sym){
+        return symbolFactory.newSymbol(name,sym,new Location(yyline+1,yycolumn+1,yychar), new Location(yyline+1,yycolumn+yylength(),yychar+yylength()));
+    }
+
+    private Symbol symbol(String name, int sym, Object val){
+        Location left = new Location(yyline+1,yycolumn+1,yychar);
+        Location right = new Location(yyline+1,yycolumn+yylength(),yychar+yylength());
+        return symbolFactory.newSymbol(name,sym,left,right,val);
+
+    }
+
+    private Symbol symbol(String name, int sym, Object val, int buflength){
+        Location left = new Location(yyline+1,yycolumn+yylength()-buflength, yychar+yylength()-buflength);
+        Location right = new Location(yyline+1,yycolumn+yylength(), yychar+yylength());
+        return symbolFactory.newSymbol(name,sym,left,right,val);
+    }
+
+    private void error(String message){
+
+        System.out.println("Error at line "+(yyline+1)+", column "+(yycolumn+1)+" : "+message);
+    }
+
+
+    StringBuffer comment = new StringBuffer();
+%}
+%eofval{
+     return symbolFactory.newSymbol("EOF", EOF, new Location(yyline+1,yycolumn+1,yychar), new Location(yyline+1,yycolumn+1,yychar+1));
+%eofval}
+%state STRING
+%state COMMENTS
 
 DIGIT = [0-9]
 WHITESPACE = [ \t\f]
@@ -82,7 +124,7 @@ ASSIGN = ":="
 OPREL = "<"|">"|"<="|">="|"="|"/="
 SUMSUBS = "+"|"-"
 MULDIV = "/"|"*"
-IDENTIFIER = {CHAR}({CHAR}|{DIGIT}|{SPECIALCHAR})*
+IDEN = [a-zA-Z$_] [a-zA-Z0-9$_]*
 DOTDOT = ".."
 LPAR = "("
 RPAR = ")"
@@ -93,99 +135,92 @@ SEMICOLON = ";"
 COMMA = ","
 NUM = 0 | ([1-9]{DIGIT}*)
 REAL = {NUM}+"."{NUM}+
-%{
-    StringBuffer string = new StringBuffer();
-    StringBuffer comment = new StringBuffer();
-%}
-
-%state STRING
-%state COMMENTS
 
 %%
 <YYINITIAL>{
-    {WHITESPACE} {}
+    {WHITESPACE} {/* ignore */}
     {NEWLINE} {}
     \" {string.setLength(0); yybegin(STRING);}
     {DDASH} {comment.setLength(0); yybegin(COMMENTS);}
-    {SUMSUBS} { return new Symbol(sym.SUMSUBS,yycolumn+1,yyline+1,yytext());}
-    {MULDIV} {  return new Symbol(sym.MULDIV,yycolumn+1,yyline+1,yytext()); }
-    {LPAR} {return new Symbol(sym.LPAR,yycolumn+1,yyline+1,yytext());}
-    {RPAR} {return new Symbol(sym.RPAR,yycolumn+1,yyline+1,yytext());}
-    {SEMICOLON} {  return new Symbol(sym.SEMICOLON,yycolumn+1,yyline+1,yytext());}
-    {COMMA} {  return new Symbol(sym.COMMA,yycolumn+1,yyline+1,yytext());}
-    {DOTDOT} {  return new Symbol(sym.DOTDOT,yycolumn+1,yyline+1,yytext());}
-    {ABORT} {  return new Symbol(sym.ABORT,yycolumn+1,yyline+1,yytext());}
-    {AND} {  return new Symbol(sym.AND,yycolumn+1,yyline+1,yytext());}
-    {CASE} {  return new Symbol(sym.CASE,yycolumn+1,yyline+1,yytext());}
-    {DIGITS} {return new Symbol(sym.DIGITS,yycolumn+1,yyline+1,yytext());}
-    {EXCEPTION} {  return new Symbol(sym.EXCEPTION,yycolumn+1,yyline+1,yytext());}
-    {GOTO} {  return new Symbol(sym.GOTO,yycolumn+1,yyline+1,yytext());}
-    {LOOP} {  return new Symbol(sym.LOOP,yycolumn+1,yyline+1,yytext());}
-    {OF} {  return new Symbol(sym.OF,yycolumn+1,yyline+1,yytext());}
-    {RECORD} {  return new Symbol(sym.RECORD,yycolumn+1,yyline+1,yytext());}
-    {SELECT} {  return new Symbol(sym.SELECT,yycolumn+1,yyline+1,yytext());}
-    {THEN} {  return new Symbol(sym.THEN,yycolumn+1,yyline+1,yytext());}
-    {WITH} {  return new Symbol(sym.WITH,yycolumn+1,yyline+1,yytext());}
-    {ABS} {  return new Symbol(sym.ABS,yycolumn+1,yyline+1,yytext());}
-    {ARRAY} {  return new Symbol(sym.ARRAY,yycolumn+1,yyline+1,yytext());}
-    {CONSTANT} {  return new Symbol(sym.CONSTANT,yycolumn+1,yyline+1,yytext());}
-    {DO} {  return new Symbol(sym.DO,yycolumn+1,yyline+1,yytext());}
-    {EXIT} {  return new Symbol(sym.EXIT,yycolumn+1,yyline+1,yytext());}
-    {IF} {  return new Symbol(sym.IF,yycolumn+1,yyline+1,yytext());}
-    {MOD} {  return new Symbol(sym.MOD,yycolumn+1,yyline+1,yytext());}
-    {OR} {  return new Symbol(sym.OR,yycolumn+1,yyline+1,yytext());}
-    {PRIVATE} {  return new Symbol(sym.PRIVATE,yycolumn+1,yyline+1,yytext());}
-    {REM} {  return new Symbol(sym.REM,yycolumn+1,yyline+1,yytext());}
-    {SEPARATE} {  return new Symbol(sym.SEPARATE,yycolumn+1,yyline+1,yytext());}
-    {TYPE} {  return new Symbol(sym.TYPE,yycolumn+1,yyline+1,yytext());}
-    {XOR} {  return new Symbol(sym.XOR,yycolumn+1,yyline+1,yytext());}
-    {ACCEPT} {  return new Symbol(sym.ACCEPT,yycolumn+1,yyline+1,yytext());}
-    {AT} {  return new Symbol(sym.AT,yycolumn+1,yyline+1,yytext());}
-    {DECLARE} {  return new Symbol(sym.DECLARE,yycolumn+1,yyline+1,yytext());}
-    {ELSE} {  return new Symbol(sym.ELSE,yycolumn+1,yyline+1,yytext());}
-    {FOR} {  return new Symbol(sym.FOR,yycolumn+1,yyline+1,yytext());}
-    {IN} {  return new Symbol(sym.IN,yycolumn+1,yyline+1,yytext());}
-    {NEW} {  return new Symbol(sym.NEW,yycolumn+1,yyline+1,yytext());}
-    {OTHERS} {  return new Symbol(sym.OTHERS,yycolumn+1,yyline+1,yytext());}
-    {PROCEDURE} {  return new Symbol(sym.PROCEDURE,yycolumn+1,yyline+1,yytext());}
-    {RENAMES} {  return new Symbol(sym.RENAMES,yycolumn+1,yyline+1,yytext());}
-    {SUBTYPE} {  return new Symbol(sym.SUBTYPE,yycolumn+1,yyline+1,yytext());}
-    {USE} {  return new Symbol(sym.USE,yycolumn+1,yyline+1,yytext());}
-    {ACCESS} {  return new Symbol(sym.ACCESS,yycolumn+1,yyline+1,yytext());}
-    {BEGIN} {  return new Symbol(sym.BEGIN,yycolumn+1,yyline+1,yytext());}
-    {DELAY} {  return new Symbol(sym.DELAY,yycolumn+1,yyline+1,yytext());}
-    {END} {  return new Symbol(sym.END,yycolumn+1,yyline+1,yytext());}
-    {FUNCTION} {  return new Symbol(sym.FUNCTION,yycolumn+1,yyline+1,yytext());}
-    {IS} {  return new Symbol(sym.IS,yycolumn+1,yyline+1,yytext());}
-    {NOT} {  return new Symbol(sym.NOT,yycolumn+1,yyline+1,yytext());}
-    {OUT} {  return new Symbol(sym.OUT,yycolumn+1,yyline+1,yytext());}
-    {RAISE} {  return new Symbol(sym.RAISE,yycolumn+1,yyline+1,yytext());}
-    {RETURN} {  return new Symbol(sym.RETURN,yycolumn+1,yyline+1,yytext());}
-    {TASK} {  return new Symbol(sym.TASK,yycolumn+1,yyline+1,yytext());}
-    {WHEN} {  return new Symbol(sym.WHEN,yycolumn+1,yyline+1,yytext());}
-    {ALL} {  return new Symbol(sym.ALL,yycolumn+1,yyline+1,yytext());}
-    {BODY} {  return new Symbol(sym.BODY,yycolumn+1,yyline+1,yytext());}
-    {DELTA} {  return new Symbol(sym.DELTA,yycolumn+1,yyline+1,yytext());}
-    {ENTRY} {  return new Symbol(sym.ENTRY,yycolumn+1,yyline+1,yytext());}
-    {GENERIC} {  return new Symbol(sym.GENERIC,yycolumn+1,yyline+1,yytext());}
-    {LIMITED} {  return new Symbol(sym.LIMITED,yycolumn+1,yyline+1,yytext());}
-    {NULL} {  return new Symbol(sym.NULL,yycolumn+1,yyline+1,yytext());}
-    {ELSIF} { return new Symbol(sym.ELSIF,yycolumn+1,yyline+1,yytext());}
-    {PACKAGE} {  return new Symbol(sym.PACKAGE,yycolumn+1,yyline+1,yytext());}
-    {RANGE} {  return new Symbol(sym.RANGE,yycolumn+1,yyline+1,yytext());}
-    {REVERSE} {  return new Symbol(sym.REVERSE,yycolumn+1,yyline+1,yytext());}
-    {TERMINATE} {  return new Symbol(sym.TERMINATE,yycolumn+1,yyline+1,yytext());}
-    {WHILE} {  return new Symbol(sym.WHILE,yycolumn+1,yyline+1,yytext());}
-    {INTEGER} {  return new Symbol(sym.INTEGER,yycolumn+1,yyline+1,yytext());}
-    {FLOAT} { return new Symbol(sym.FLOAT,yycolumn+1,yyline+1,yytext());}
-    {BOOLEAN} { return new Symbol(sym.BOOLEAN,yycolumn+1,yyline+1,yytext());}
-    {GET} { return new Symbol(sym.GET,yycolumn+1,yyline+1,yytext());}
-    {PUT} { return new Symbol(sym.PUT,yycolumn+1,yyline+1,yytext());}
-    {IDENTIFIER} {  return new Symbol(sym.IDENTIFIER,yycolumn+1,yyline+1,yytext());}
-    {NUM} {  return new Symbol(sym.NUM,yycolumn+1,yyline+1,yytext());}
-    {REAL} {  return new Symbol(sym.REAL,yycolumn+1,yyline+1,yytext());}
-    {OPREL} {  return new Symbol(sym.OPREL,yycolumn+1,yyline+1,yytext());}
-    {ASSIGN} {  return new Symbol(sym.ASSIGN,yycolumn+1,yyline+1,yytext());}
+    {SUMSUBS} { return symbol("SUMSUBS",SUMSUBS);}
+    {MULDIV} {  return symbol("MULDIV",MULDIV);}
+    {LPAR} {return symbol("LPAR",LPAR);}
+    {RPAR} {return symbol("RPAR",RPAR);}
+    {SEMICOLON} {  return symbol("SEMICOLON",SEMICOLON);}
+    {COMMA} {  return symbol("COMMA",COMMA);}
+    {DOTDOT} {  return symbol("DOTDOT",DOTDOT);}
+    {ABORT} {  return symbol("ABORT",ABORT);}
+    {AND} {  return symbol("AND",AND);}
+    {CASE} {  return symbol("CASE",CASE);}
+    {DIGITS} {return symbol("DIGITS",DIGITS);}
+    {EXCEPTION} {  return symbol("EXCEPTION",EXCEPTION);}
+    {GOTO} {  return symbol("GOTO",GOTO);}
+    {LOOP} {  return symbol("LOOP",LOOP);}
+    {OF} {  return symbol("OF",OF);}
+    {RECORD} {  return symbol("RECORD",RECORD);}
+    {SELECT} {  return symbol("SELECT",SELECT);}
+    {THEN} {  return symbol("THEN",SELECT);}
+    {WITH} {  return symbol("WITH",SELECT);}
+    {ABS} {  return symbol("ABS",ABS);}
+    {ARRAY} {  return symbol("ARRAY",ARRAY);}
+    {CONSTANT} {  return symbol("CONSTANT",CONSTANT);}
+    {DO} {  return symbol("DO",DO);}
+    {EXIT} {  return symbol("EXIT",EXIT);}
+    {IF} {  return symbol("IF",IF);}
+    {MOD} {  return symbol("MOD",MOD);}
+    {OR} {  return symbol("OR",OR);}
+    {PRIVATE} {  return symbol("PRIVATE",PRIVATE);}
+    {REM} {  return symbol("REM",REM);}
+    {SEPARATE} {  return symbol("SEPARATE",SEPARATE);}
+    {TYPE} {  return symbol("TYPE",TYPE);}
+    {XOR} {  return symbol("XOR",XOR);}
+    {ACCEPT} {  return symbol("ACCEPT",ACCEPT);}
+    {AT} {  return symbol("AT",AT);}
+    {DECLARE} {  return symbol("DECLARE",DECLARE);}
+    {ELSE} {  return symbol("ELSE",ELSE);}
+    {FOR} {  return symbol("FOR",FOR);}
+    {IN} {  return symbol("IN",IN);}
+    {NEW} {  return symbol("NEW",NEW);}
+    {OTHERS} {  return symbol("OTHERS",OTHERS);}
+    {PROCEDURE} {  return symbol("PROCEDURE",PROCEDURE);}
+    {RENAMES} {  return symbol("RENAMES",RENAMES);}
+    {SUBTYPE} {  return symbol("SUBTYPE",SUBTYPE);}
+    {USE} {  return symbol("USE",USE);}
+    {ACCESS} {  return symbol("ACCESS",ACCESS);}
+    {BEGIN} {  return symbol("BEGIN",BEGIN);}
+    {DELAY} {  return symbol("DELAY",DELAY);}
+    {END} {  return symbol("END",END);}
+    {FUNCTION} {  return symbol("FUNCTION",FUNCTION);}
+    {IS} {  return symbol("IS",IS);}
+    {NOT} {  return symbol("NOT",NOT);}
+    {OUT} {  return symbol("OUT",OUT);}
+    {RAISE} {  return symbol("RAISE",RAISE);}
+    {RETURN} {  return symbol("RETURN",RETURN);}
+    {TASK} {  return symbol("TASK",TASK);}
+    {WHEN} {  return symbol("WHEN",WHEN);}
+    {ALL} {  return symbol("ALL",ALL);}
+    {BODY} {  return symbol("BODY",BODY);}
+    {DELTA} {  return symbol("DELTA",DELTA);}
+    {ENTRY} {  return symbol("ENTRY",ENTRY);}
+    {GENERIC} {  return symbol("GENERIC",GENERIC);}
+    {LIMITED} {  return symbol("LIMITED",LIMITED);}
+    {NULL} {  return symbol("NULL",NULL);}
+    {ELSIF} { return symbol("ELSIF",ELSIF);}
+    {PACKAGE} {  return symbol("PACKAGE",PACKAGE);}
+    {RANGE} {  return symbol("RANGE",RANGE);}
+    {REVERSE} {  return symbol("REVERSE",REVERSE);}
+    {TERMINATE} {  return symbol("TERMINATE",TERMINATE);}
+    {WHILE} {  return symbol("WHILE",WHILE);}
+    {INTEGER} {  return symbol("INTEGER",INTEGER);}
+    {FLOAT} { return symbol("FLOAT",FLOAT);}
+    {BOOLEAN} { return symbol("BOOLEAN",BOOLEAN);}
+    {GET} { return symbol("GET",GET);}
+    {PUT} { return symbol("PUT",PUT);}
+    {IDEN} {  return symbol("IDEN",IDEN, yytext());}
+    {NUM} {  return symbol("NUM",NUM, new Integer(Integer.parseInt(yytext())));}
+    {REAL} {  return symbol("REAL",REAL, new Float(Float.parseFloat(yytext())));}
+    {OPREL} {  return symbol("OPREL",OPREL);}
+    {ASSIGN} {  return symbol("ASSIGN",ASSIGN);}
     . {System.out.print("Unexpected token: "+ yytext());}
 }
 

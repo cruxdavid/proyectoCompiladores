@@ -1,5 +1,12 @@
 import java.io.*;
-import java_cup.runtime.*;
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ScannerBuffer;
+import java_cup.runtime.Symbol;
+import java_cup.runtime.XMLElement;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.*;
 import java.util.*;
 import java.lang.*;
 
@@ -28,7 +35,7 @@ parser code {:
     public void report_error(String message, Object info) {
     if (info instanceof String){
 	err++; 
-      System.err.println("  "+ errors + "==> " + info + " "+ message+".");
+      System.err.println("  "+ err + "==> " + info + " "+ message+".");
     }
     else {
     	StringBuffer m = new StringBuffer("Error ");
@@ -39,11 +46,39 @@ parser code {:
      }
    }
 
+	public Parser(Lexer lex, ComplexSymbolFactory sf){
+		super(lex,sf);
+	}
+
+	public static void main(String[] args) throws Exception{
+
+		ComplexSymbolFactory csf = new ComplexSymbolFactory();
+		Reader rscanner;
+		rscanner = new BufferedReader(new FileReader("source.txt"));
+		ScannerBuffer lexer = new ScannerBuffer(new Lexer(rscanner,csf));
+
+		Parser p = new Parser(lexer,csf);
+		XMLElement e = (XMLElement)p.parse().value;
+
+		XMLOutputFactory outFactory = XMLOutputFactory.newInstance();
+		XMLStreamWriter sw = outFactory.createXMLStreamWriter(new FileOutputStream("outStream.xml"),"UTF-8");
+		XMLElement.dump(lexer,sw,e,"expr","stmt");
+
+		Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("tree.xsl")));
+
+		Source text = new StreamSource(new File("outStream.xml"));
+		transformer.transform(text, new StreamResult(new File("output.xml")));
+		transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("tree-view.xsl")));
+
+		text = new StreamSource(new File("output.xml"));
+		transformer.transform(text, new StreamResult(new File("ast.html")));
+
+	}
 :}
 
 // Terminales
-terminal            SUMSUBS,MULDIV,LPAR,RPAR,SEMICOLON,COMMA,DOTDOT,ABORT,AND,CASE,DIGITS,EXCEPTION,GOTO,LOOP,OF,RECORD,SELECT,THEN,WITH,ABS,ARRAY,CONSTANT,DO,EXIT,IF,MOD,OR,PRIVATE,REM,SEPARATE,TYPE,XOR,ACCEPT,AT,DECLARE,ELSE,FOR,IN,NEW,OTHERS,PROCEDURE,RENAMES,SUBTYPE,USE,ACCESS,BEGIN,DELAY,END,FUNCTION,IS,NOT,OUT,RAISE,RETURN,TASK,WHEN,ALL,BODY,DELTA,ENTRY,GENERIC,LIMITED,NULL,ELSIF,PACKAGE,RANGE,REVERSE,TERMINATE,WHILE,BOOLEAN,GET,PUT,IDENTIFIER,OPREL,ASSIGN,INTEGER,FLOAT;
-terminal Integer    NUM;        // our scanner provides numbers as integers
+terminal            SUMSUBS,MULDIV,LPAR,RPAR,SEMICOLON,COMMA,DOTDOT,ABORT,AND,CASE,DIGITS,EXCEPTION,GOTO,LOOP,OF,RECORD,SELECT,THEN,WITH,ABS,ARRAY,CONSTANT,DO,EXIT,IF,MOD,OR,PRIVATE,REM,SEPARATE,TYPE,XOR,ACCEPT,AT,DECLARE,ELSE,FOR,IN,NEW,OTHERS,PROCEDURE,RENAMES,SUBTYPE,USE,ACCESS,BEGIN,DELAY,END,FUNCTION,IS,NOT,OUT,RAISE,RETURN,TASK,WHEN,ALL,BODY,DELTA,ENTRY,GENERIC,LIMITED,NULL,ELSIF,PACKAGE,RANGE,REVERSE,TERMINATE,WHILE,BOOLEAN,GET,PUT,IDEN,OPREL,ASSIGN,INTEGER,FLOAT;
+terminal Integer    NUM;      
 terminal Double     REAL;
 
 //No terminales
@@ -56,8 +91,9 @@ precedence left MULDIV;
 precedence left SUMSUBS;
 
 //Gramaticas
-procedure ::= PROCEDURE IDENTIFIER IS BEGIN procedure END IDENTIFIER SEMICOLON
-			| PROCEDURE IDENTIFIER IS BEGIN sequence_of_statements procedure END IDENTIFIER SEMICOLON
+
+procedure ::= PROCEDURE IDEN IS BEGIN procedure END IDEN SEMICOLON 
+			| PROCEDURE IDEN IS BEGIN sequence_of_statements procedure END IDEN SEMICOLON 
 			| empty;
 
 sequence_of_statements ::= sequence_of_statements statement 
@@ -89,8 +125,8 @@ rest_of_loop ::= LOOP sequence_of_statements END LOOP SEMICOLON;
 
 condition ::= expression;
 
-assignment_statement ::= IDENTIFIER ASSIGN expression SEMICOLON
-			| IDENTIFIER ASSIGN error SEMICOLON {: parser.report_error("assignment_statement","WRONG"); :}
+assignment_statement ::= IDEN ASSIGN expression SEMICOLON
+			| IDEN ASSIGN error SEMICOLON {: parser.report_error("assignment_statement","WRONG"); :}
 			;
 
 expression ::= expression boolean_operator relation
@@ -110,7 +146,7 @@ term ::= term MULDIV factor
 		|factor
 		;
 
-factor ::=  IDENTIFIER
+factor ::=  IDEN
 		  | NUM
 		  | REAL
 		  | LPAR arithmetic_expression RPAR
