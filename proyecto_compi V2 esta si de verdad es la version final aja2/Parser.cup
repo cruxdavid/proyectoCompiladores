@@ -42,22 +42,25 @@ parser code {:
 :}
 
 // Terminales
-terminal            SUMSUBS,MULDIV,LPAR,RPAR,SEMICOLON,COMMA,DOTDOT,ABORT,AND,CASE,DIGITS,EXCEPTION,GOTO,LOOP,OF,RECORD,SELECT,THEN,WITH,ABS,ARRAY,CONSTANT,DO,EXIT,IF,MOD,OR,PRIVATE,REM,SEPARATE,TYPE,XOR,ACCEPT,AT,DECLARE,ELSE,FOR,IN,NEW,OTHERS,PROCEDURE,RENAMES,SUBTYPE,USE,ACCESS,BEGIN,DELAY,END,FUNCTION,IS,NOT,OUT,RAISE,RETURN,TASK,WHEN,ALL,BODY,DELTA,ENTRY,GENERIC,LIMITED,NULL,ELSIF,PACKAGE,RANGE,REVERSE,TERMINATE,WHILE,BOOLEAN,GET,PUT,IDENTIFIER,OPREL,ASSIGN,INTEGER,FLOAT;
+terminal            SUMSUBS,MULDIV,LPAR,RPAR,SEMICOLON,COMMA,DOTDOT,ABORT,AND,CASE,DIGITS,EXCEPTION,GOTO,LOOP,OF,RECORD,SELECT,THEN,WITH,ABS,ARRAY,CONSTANT,DO,EXIT,IF,MOD,OR,PRIVATE,REM,SEPARATE,TYPE,XOR,ACCEPT,AT,DECLARE,ELSE,FOR,IN,NEW,OTHERS,PROCEDURE,RENAMES,SUBTYPE,USE,ACCESS,BEGIN,DELAY,END,FUNCTION,IS,NOT,OUT,RAISE,RETURN,TASK,WHEN,ALL,BODY,DELTA,ENTRY,GENERIC,LIMITED,NULL,ELSIF,PACKAGE,RANGE,REVERSE,TERMINATE,WHILE,BOOLEAN,GET,PUT,IDEN,OPREL,ASSIGN,INTEGER,FLOAT;
 terminal Integer    NUM;      
 terminal Double     REAL;
 
 //No terminales
 non terminal           procedure,sequence_of_statements,empty,arithmetic_expression,term,factor,statement,relation,
 					   boolean_operation,expression,assignment_statement,simple_statement,compound_statement,
-					   if_statement,condition,elsif,else,loop_statement,while_or_for,rest_of_loop,condition_part;
+					   if_statement,condition,elsif,else,loop_statement,while_or_for,rest_of_loop,condition_part,initial;
 
 //Precedencias
 precedence left MULDIV;
 precedence left SUMSUBS;
 
 //Gramaticas
-procedure ::= PROCEDURE IDENTIFIER IS BEGIN procedure END IDENTIFIER SEMICOLON
-			| PROCEDURE IDENTIFIER IS BEGIN sequence_of_statements procedure END IDENTIFIER SEMICOLON
+
+initial ::= procedure;
+
+procedure ::= PROCEDURE IDEN IS BEGIN procedure END IDEN SEMICOLON 
+			| PROCEDURE IDEN IS BEGIN sequence_of_statements procedure END IDEN SEMICOLON 
 			| empty;
 
 sequence_of_statements ::= sequence_of_statements statement 
@@ -88,7 +91,7 @@ rest_of_loop ::= LOOP sequence_of_statements END LOOP SEMICOLON;
 
 condition ::= expression;
 
-assignment_statement ::= IDENTIFIER ASSIGN expression SEMICOLON;
+assignment_statement ::= IDEN ASSIGN expression SEMICOLON;
 
 expression ::= expression boolean_operation relation
 			| relation;
@@ -104,7 +107,7 @@ arithmetic_expression ::= arithmetic_expression SUMSUBS term
 term ::= term MULDIV factor
 		|factor;
 
-factor ::=  IDENTIFIER
+factor ::=  IDEN
 		  | NUM
 		  | REAL
 		  | LPAR arithmetic_expression RPAR;

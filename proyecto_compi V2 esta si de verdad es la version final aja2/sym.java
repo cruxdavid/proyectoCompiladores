@@ -7,7 +7,6 @@
 public interface sym {
   /* terminals */
   public static final int AT = 35;
-  public static final int IDENTIFIER = 74;
   public static final int REAL = 80;
   public static final int OPREL = 75;
   public static final int LIMITED = 63;
@@ -17,6 +16,7 @@ public interface sym {
   public static final int GET = 72;
   public static final int RENAMES = 43;
   public static final int ELSIF = 65;
+  public static final int IDEN = 74;
   public static final int TERMINATE = 69;
   public static final int COMMA = 7;
   public static final int ALL = 58;
@@ -162,7 +162,7 @@ public interface sym {
   "BOOLEAN",
   "GET",
   "PUT",
-  "IDENTIFIER",
+  "IDEN",
   "OPREL",
   "ASSIGN",
   "INTEGER",

@@ -44,7 +44,9 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
 
     StringBuffer comment = new StringBuffer();
 %}
-
+%eofval{
+     return symbolFactory.newSymbol("EOF", EOF, new Location(yyline+1,yycolumn+1,yychar), new Location(yyline+1,yycolumn+1,yychar+1));
+%eofval}
 %state STRING
 %state COMMENTS
 
@@ -122,7 +124,7 @@ ASSIGN = ":="
 OPREL = "<"|">"|"<="|">="|"="|"/="
 SUMSUBS = "+"|"-"
 MULDIV = "/"|"*"
-IDENTIFIER = {CHAR}({CHAR}|{DIGIT}|{SPECIALCHAR})*
+IDEN = [a-zA-Z$_] [a-zA-Z0-9$_]*
 DOTDOT = ".."
 LPAR = "("
 RPAR = ")"
@@ -214,9 +216,9 @@ REAL = {NUM}+"."{NUM}+
     {BOOLEAN} { return symbol("BOOLEAN",BOOLEAN);}
     {GET} { return symbol("GET",GET);}
     {PUT} { return symbol("PUT",PUT);}
-    {IDENTIFIER} {  return symbol("IDENTIFIER",IDENTIFIER);}
-    {NUM} {  return symbol("NUM",NUM);}
-    {REAL} {  return symbol("REAL",REAL);}
+    {IDEN} {  return symbol("IDEN",IDEN, yytext());}
+    {NUM} {  return symbol("NUM",NUM, new Integer(Integer.parseInt(yytext())));}
+    {REAL} {  return symbol("REAL",REAL, new Float(Float.parseFloat(yytext())));}
     {OPREL} {  return symbol("OPREL",OPREL);}
     {ASSIGN} {  return symbol("ASSIGN",ASSIGN);}
     . {System.out.print("Unexpected token: "+ yytext());}
@@ -236,5 +238,3 @@ REAL = {NUM}+"."{NUM}+
     . {comment.append( yytext() );}
     {NEWLINE} {yybegin(YYINITIAL);}
 }
-
-<<EOF>> {return symbolFactory.newSymbol("EOF", EOF, new Location(yyline+1,yycolumn+1,yychar), new Location(yyline+1,yycolumn+1,yychar+1));}
