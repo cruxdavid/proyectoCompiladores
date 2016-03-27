@@ -286,13 +286,11 @@ public class Parser extends java_cup.runtime.lr_parser {
 		XMLElement.dump(lexer,sw,e,"expr","stmt");
 
 		Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("tree.xsl")));
-
-		Source text = new StreamSource(new File("outStream.xml"));
-		transformer.transform(text, new StreamResult(new File("output.xml")));
-		transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("tree-view.xsl")));
-
-		text = new StreamSource(new File("output.xml"));
-		transformer.transform(text, new StreamResult(new File("ast.html")));
+      	Source text = new StreamSource(new File("outStream.xml"));
+      	transformer.transform(text, new StreamResult(new File("output.xml")));
+      	transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("tree-view.xsl")));
+      	text = new StreamSource(new File("output.xml"));
+      	transformer.transform(text, new StreamResult(new File("ast.html")));
 
 	}
 

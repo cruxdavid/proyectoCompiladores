@@ -1,0 +1,16 @@
+body       { font-family: sans-serif; background-color: #EAEAD9; color: black }
+
+.connector { font-family: monospace }
+
+.name      { color: navy; font-style:italic; padding-top: 4px; padding-bottom: 0; padding-left: 0; padding-right: 0 }
+.value     { color: #040; background-color: white; font-weight: bold }
+.escape    { color: #620; font-family: monospace }
+
+.root      { color: yellow; background-color: black }
+.element   { color: white;  background-color: navy; border: 1px solid white; }
+.attribute { color: red; background-color: #040 }
+.text      { color: yellow; background-color: #400 }
+.pi        { color: yellow; background-color: #044 }
+
+.root,.element,.attribute,.text,.pi
+  { font-weight: bold; padding-top: 3px; padding-bottom: 4px; padding-left: 6px; padding-right: 6px }
