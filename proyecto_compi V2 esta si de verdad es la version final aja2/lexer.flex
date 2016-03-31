@@ -163,8 +163,8 @@ REAL = {NUM}+"."{NUM}+
     {OF} {  return symbol("OF",OF);}
     {RECORD} {  return symbol("RECORD",RECORD);}
     {SELECT} {  return symbol("SELECT",SELECT);}
-    {THEN} {  return symbol("THEN",SELECT);}
-    {WITH} {  return symbol("WITH",SELECT);}
+    {THEN} {  return symbol("THEN",THEN);}
+    {WITH} {  return symbol("WITH",WITH);}
     {ABS} {  return symbol("ABS",ABS);}
     {ARRAY} {  return symbol("ARRAY",ARRAY);}
     {CONSTANT} {  return symbol("CONSTANT",CONSTANT);}

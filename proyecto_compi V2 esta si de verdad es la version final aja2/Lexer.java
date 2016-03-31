@@ -1272,7 +1272,7 @@ public class Lexer implements java_cup.runtime.Scanner, sym {
             }
           case 144: break;
           case 51: 
-            { return symbol("THEN",SELECT);
+            { return symbol("THEN",THEN);
             }
           case 145: break;
           case 52: 
@@ -1304,7 +1304,7 @@ public class Lexer implements java_cup.runtime.Scanner, sym {
             }
           case 152: break;
           case 59: 
-            { return symbol("WITH",SELECT);
+            { return symbol("WITH",WITH);
             }
           case 153: break;
           case 60: 

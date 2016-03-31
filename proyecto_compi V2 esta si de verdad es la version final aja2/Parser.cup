@@ -24,7 +24,7 @@ parser code {:
 	public void unrecovered_syntax_error (Symbol s) throws java.lang.Exception
 	{
             err++;
-            System.out.println("Could not recover from error.");
+            System.out.println("Finished. Please fix errors.");
 	}
         
     public void PrintErrores()
@@ -94,14 +94,11 @@ parser code {:
 
 	non terminal 		subprogramDeclaration, subprogramSpecification, declBody, parameterInParenthesis, typeParam, parameterSpecification,  parameterSpecificationP, idSequence,
 						mode, basicDecl, basicDeclItem, numDecl, declareAndAssign;					   
-/* 3. Precedencias */
+/* 3. Precedencias y Gramatica */
 
 
 	precedence left MULDIV;
 	precedence left SUMSUBS;
-
-/* 4. Gramaticas con manejo de errores. */
-
 
 	procedure ::= PROCEDURE ID IS BEGIN procedure END ID SEMICOLON
 	            | PROCEDURE ID error:e {:parser.report_error("Unexpected symbol", "Wrong procedure,");:} BEGIN statementsSeguidos procedure END ID SEMICOLON

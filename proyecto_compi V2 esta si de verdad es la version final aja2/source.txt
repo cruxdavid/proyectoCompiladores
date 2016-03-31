@@ -1,27 +1,11 @@
 procedure HOLA is
 begin
-   procedure XY is
-   begin
-   ABC := 3 + 90 and JK;
-   ABC := 3 + 90 and JK;
-   if A and B then
-	ABC := 3 + 90 and JK;
-   elsif A or C then
-	ABC := 3 + 90 and JK;
-   elsif A or C then
-	if A and B then
-	   ABC := 3 + 90 and JK;
-   	else
-	   ABC := 3 + 90 and JK;
-        end if;
-   else
-	ABC := 3 + 90 and JK;
-   end if;
-   while A > B loop
-	ABC := 3 + 90 and JK;
-	    while A > B loop
-		ABC := 3 + 90 and JK;
+   x := 10 +1;
+      while x < 32 loop
+	x := 3 + 33;
+	    while x < 45 loop
+		x := x + 1;
             end loop;
-   end loop;
-  end XY;
+      end loop;
+   
 end HOLA;
