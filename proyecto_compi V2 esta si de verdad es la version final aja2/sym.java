@@ -6,90 +6,107 @@
 /** CUP generated interface containing symbol constants. */
 public interface sym {
   /* terminals */
-  public static final int AT = 35;
-  public static final int REAL = 80;
-  public static final int OPREL = 75;
-  public static final int LIMITED = 63;
-  public static final int TYPE = 32;
-  public static final int SUBTYPE = 44;
-  public static final int RAISE = 54;
-  public static final int GET = 72;
-  public static final int RENAMES = 43;
-  public static final int ELSIF = 65;
-  public static final int IDEN = 74;
-  public static final int TERMINATE = 69;
-  public static final int COMMA = 7;
-  public static final int ALL = 58;
-  public static final int INTEGER = 77;
-  public static final int DECLARE = 36;
-  public static final int ABORT = 9;
-  public static final int PUT = 73;
-  public static final int ACCESS = 46;
-  public static final int LOOP = 15;
-  public static final int OUT = 53;
-  public static final int NOT = 52;
-  public static final int TASK = 56;
-  public static final int SUMSUBS = 2;
-  public static final int ARRAY = 22;
-  public static final int FLOAT = 78;
-  public static final int THEN = 19;
-  public static final int GOTO = 14;
-  public static final int PACKAGE = 66;
-  public static final int NUM = 79;
-  public static final int RECORD = 17;
-  public static final int REVERSE = 68;
-  public static final int MOD = 27;
-  public static final int WHEN = 57;
-  public static final int GENERIC = 62;
-  public static final int DIGITS = 12;
-  public static final int SELECT = 18;
-  public static final int OTHERS = 41;
-  public static final int LPAR = 4;
-  public static final int WHILE = 70;
-  public static final int USE = 45;
-  public static final int ASSIGN = 76;
-  public static final int MULDIV = 3;
-  public static final int BOOLEAN = 71;
-  public static final int DO = 24;
-  public static final int FOR = 38;
-  public static final int RETURN = 55;
-  public static final int DELAY = 48;
-  public static final int ELSE = 37;
-  public static final int DOTDOT = 8;
-  public static final int PROCEDURE = 42;
-  public static final int ENTRY = 61;
-  public static final int DELTA = 60;
-  public static final int NULL = 64;
+  public static final int AT = 49;
+  public static final int REAL = 83;
+  public static final int OPREL = 76;
+  public static final int LIMITED = 64;
+  public static final int TYPE = 46;
+  public static final int SUBTYPE = 4;
+  public static final int RAISE = 14;
+  public static final int GET = 73;
+  public static final int RENAMES = 3;
+  public static final int ELSIF = 66;
+  public static final int TERMINATE = 70;
+  public static final int COMMA = 21;
+  public static final int ALL = 59;
+  public static final int INTEGER = 78;
+  public static final int DECLARE = 50;
+  public static final int ABORT = 23;
+  public static final int PUT = 74;
+  public static final int ACCESS = 6;
+  public static final int LOOP = 29;
+  public static final int OUT = 13;
+  public static final int NOT = 12;
+  public static final int TASK = 57;
+  public static final int SUMSUBS = 16;
+  public static final int ARRAY = 36;
+  public static final int FLOAT = 79;
+  public static final int THEN = 33;
+  public static final int GOTO = 28;
+  public static final int PACKAGE = 67;
+  public static final int NUM = 82;
+  public static final int NUL = 65;
+  public static final int RECORD = 31;
+  public static final int REVERSE = 69;
+  public static final int MOD = 41;
+  public static final int WHEN = 58;
+  public static final int GENERIC = 63;
+  public static final int DIGITS = 26;
+  public static final int SELECT = 32;
+  public static final int OTHERS = 55;
+  public static final int PARAMASSIGN = 81;
+  public static final int WHILE = 71;
+  public static final int LPAR = 18;
+  public static final int USE = 5;
+  public static final int ASSIGN = 77;
+  public static final int MULDIV = 17;
+  public static final int BOOLEAN = 72;
+  public static final int DO = 38;
+  public static final int FOR = 52;
+  public static final int RETURN = 56;
+  public static final int DELAY = 8;
+  public static final int ELSE = 51;
+  public static final int DOTDOT = 22;
+  public static final int PROCEDURE = 2;
+  public static final int ENTRY = 62;
+  public static final int DELTA = 61;
+  public static final int NULL = 15;
   public static final int EOF = 0;
-  public static final int SEMICOLON = 6;
-  public static final int RPAR = 5;
-  public static final int FUNCTION = 50;
-  public static final int IS = 51;
-  public static final int CONSTANT = 23;
-  public static final int BODY = 59;
-  public static final int ACCEPT = 34;
-  public static final int IN = 39;
-  public static final int OR = 28;
+  public static final int SEMICOLON = 20;
+  public static final int RPAR = 19;
+  public static final int FUNCTION = 10;
+  public static final int IS = 11;
+  public static final int CONSTANT = 37;
+  public static final int BODY = 60;
+  public static final int ACCEPT = 48;
+  public static final int IN = 53;
+  public static final int OR = 42;
   public static final int error = 1;
-  public static final int EXIT = 25;
-  public static final int IF = 26;
-  public static final int OF = 16;
-  public static final int ABS = 21;
-  public static final int END = 49;
-  public static final int REM = 30;
-  public static final int SEPARATE = 31;
-  public static final int BEGIN = 47;
-  public static final int CASE = 11;
-  public static final int EXCEPTION = 13;
-  public static final int NEW = 40;
-  public static final int RANGE = 67;
-  public static final int AND = 10;
-  public static final int PRIVATE = 29;
-  public static final int WITH = 20;
-  public static final int XOR = 33;
+  public static final int EXIT = 39;
+  public static final int IF = 40;
+  public static final int ID = 75;
+  public static final int OF = 30;
+  public static final int ABS = 35;
+  public static final int END = 9;
+  public static final int COLON = 80;
+  public static final int REM = 44;
+  public static final int SEPARATE = 45;
+  public static final int BEGIN = 7;
+  public static final int CASE = 25;
+  public static final int EXCEPTION = 27;
+  public static final int NEW = 54;
+  public static final int RANGE = 68;
+  public static final int AND = 24;
+  public static final int PRIVATE = 43;
+  public static final int WITH = 34;
+  public static final int XOR = 47;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
+  "PROCEDURE",
+  "RENAMES",
+  "SUBTYPE",
+  "USE",
+  "ACCESS",
+  "BEGIN",
+  "DELAY",
+  "END",
+  "FUNCTION",
+  "IS",
+  "NOT",
+  "OUT",
+  "RAISE",
+  "NULL",
   "SUMSUBS",
   "MULDIV",
   "LPAR",
@@ -130,19 +147,6 @@ public interface sym {
   "IN",
   "NEW",
   "OTHERS",
-  "PROCEDURE",
-  "RENAMES",
-  "SUBTYPE",
-  "USE",
-  "ACCESS",
-  "BEGIN",
-  "DELAY",
-  "END",
-  "FUNCTION",
-  "IS",
-  "NOT",
-  "OUT",
-  "RAISE",
   "RETURN",
   "TASK",
   "WHEN",
@@ -152,7 +156,7 @@ public interface sym {
   "ENTRY",
   "GENERIC",
   "LIMITED",
-  "NULL",
+  "NUL",
   "ELSIF",
   "PACKAGE",
   "RANGE",
@@ -162,11 +166,13 @@ public interface sym {
   "BOOLEAN",
   "GET",
   "PUT",
-  "IDEN",
+  "ID",
   "OPREL",
   "ASSIGN",
   "INTEGER",
   "FLOAT",
+  "COLON",
+  "PARAMASSIGN",
   "NUM",
   "REAL"
   };

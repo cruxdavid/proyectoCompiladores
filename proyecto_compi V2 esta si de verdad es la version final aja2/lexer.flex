@@ -1,6 +1,7 @@
 import java_cup.runtime.Symbol;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.Location;
+import java_cup.runtime.*;
 %%
 %public
 %class Lexer
@@ -45,6 +46,7 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
     StringBuffer comment = new StringBuffer();
 %}
 %eofval{
+	 
      return symbolFactory.newSymbol("EOF", EOF, new Location(yyline+1,yycolumn+1,yychar), new Location(yyline+1,yycolumn+1,yychar+1));
 %eofval}
 %state STRING
@@ -63,6 +65,7 @@ EXCEPTION = "exception"
 GOTO = "goto"
 LOOP = "loop"
 OF = "of"
+PARAMASSIGN = "=>"
 RECORD = "record"
 SELECT = "select"
 THEN = "then"
@@ -75,6 +78,7 @@ EXIT = "exit"
 IF = "if"
 ELSIF = "elsif"
 MOD = "mod"
+COLON = ":"
 OR = "or"
 PRIVATE = "private"
 REM = "rem"
@@ -124,7 +128,7 @@ ASSIGN = ":="
 OPREL = "<"|">"|"<="|">="|"="|"/="
 SUMSUBS = "+"|"-"
 MULDIV = "/"|"*"
-IDEN = [a-zA-Z$_] [a-zA-Z0-9$_]*
+ID = [a-zA-Z$_] [a-zA-Z0-9$_]*
 DOTDOT = ".."
 LPAR = "("
 RPAR = ")"
@@ -212,11 +216,13 @@ REAL = {NUM}+"."{NUM}+
     {TERMINATE} {  return symbol("TERMINATE",TERMINATE);}
     {WHILE} {  return symbol("WHILE",WHILE);}
     {INTEGER} {  return symbol("INTEGER",INTEGER);}
+	{COLON} {  return symbol("COLON", COLON);}
+    {PARAMASSIGN} { return symbol("PARAMASSIGN", PARAMASSIGN);}
     {FLOAT} { return symbol("FLOAT",FLOAT);}
     {BOOLEAN} { return symbol("BOOLEAN",BOOLEAN);}
     {GET} { return symbol("GET",GET);}
     {PUT} { return symbol("PUT",PUT);}
-    {IDEN} {  return symbol("IDEN",IDEN, yytext());}
+    {ID} {  return symbol("ID",ID, yytext());}
     {NUM} {  return symbol("NUM",NUM, new Integer(Integer.parseInt(yytext())));}
     {REAL} {  return symbol("REAL",REAL, new Float(Float.parseFloat(yytext())));}
     {OPREL} {  return symbol("OPREL",OPREL);}

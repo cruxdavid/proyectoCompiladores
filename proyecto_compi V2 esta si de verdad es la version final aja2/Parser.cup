@@ -35,7 +35,7 @@ parser code {:
     public void report_error(String message, Object info) {
     if (info instanceof String){
 	err++; 
-      System.err.println("  "+ err + "==> " + info + " "+ message+".");
+      System.err.println("  "+ "==> " + info + " "+ message+".");
     }
     else {
     	StringBuffer m = new StringBuffer("Error ");
@@ -74,80 +74,188 @@ parser code {:
 	}
 :}
 
-// Terminales
-terminal            SUMSUBS,MULDIV,LPAR,RPAR,SEMICOLON,COMMA,DOTDOT,ABORT,AND,CASE,DIGITS,EXCEPTION,GOTO,LOOP,OF,RECORD,SELECT,THEN,WITH,ABS,ARRAY,CONSTANT,DO,EXIT,IF,MOD,OR,PRIVATE,REM,SEPARATE,TYPE,XOR,ACCEPT,AT,DECLARE,ELSE,FOR,IN,NEW,OTHERS,PROCEDURE,RENAMES,SUBTYPE,USE,ACCESS,BEGIN,DELAY,END,FUNCTION,IS,NOT,OUT,RAISE,RETURN,TASK,WHEN,ALL,BODY,DELTA,ENTRY,GENERIC,LIMITED,NULL,ELSIF,PACKAGE,RANGE,REVERSE,TERMINATE,WHILE,BOOLEAN,GET,PUT,IDEN,OPREL,ASSIGN,INTEGER,FLOAT;
-terminal Integer    NUM;      
-terminal Double     REAL;
+/* 1. Terminales */
 
-//No terminales
-non terminal           procedure,sequence_of_statements,empty,arithmetic_expression,term,factor,statement,relation,
-					   boolean_operator,expression,assignment_statement,simple_statement,compound_statement,
-					   if_statement,condition,elsif,else,loop_statement,while_or_for,rest_of_loop,condition_part;
+	terminal 			PROCEDURE,RENAMES,SUBTYPE,USE,ACCESS,BEGIN,DELAY,END,FUNCTION,IS,NOT,OUT,RAISE;
+	terminal            NULL,SUMSUBS,MULDIV,LPAR,RPAR,SEMICOLON,COMMA,DOTDOT,ABORT,AND,CASE,DIGITS;
+	terminal            EXCEPTION,GOTO,LOOP,OF,RECORD,SELECT,THEN,WITH,ABS,ARRAY,CONSTANT,DO,EXIT,IF;
+	terminal			MOD,OR,PRIVATE,REM,SEPARATE,TYPE,XOR,ACCEPT,AT,DECLARE,ELSE,FOR,IN,NEW,OTHERS;
+	terminal			RETURN,TASK,WHEN,ALL,BODY,DELTA,ENTRY,GENERIC,LIMITED,NUL,ELSIF,PACKAGE,RANGE,REVERSE;
+	terminal			TERMINATE,WHILE,BOOLEAN,GET,PUT,ID,OPREL,ASSIGN,INTEGER,FLOAT, COLON, PARAMASSIGN;
+	terminal Integer    NUM;     
+	terminal Double     REAL;
 
-//Precedencias
-precedence left MULDIV;
-precedence left SUMSUBS;
+/* 2. No terminales */
+	non terminal           procedure, statementsSeguidos, empty, arithmeticExpression, term, factor, statement, relation,
+						   boolOp, expression, assignmentStatement, simpleStatement, statementCompuesto,
+						   ifStatement, condition, elsif, else, loopStatement, forOrWhile, loopBody, conditionPart;
 
-//Gramaticas
+	non terminal 		exit_statement, return_statement, callProcedure, parameterCall, parameterList, parameter,forStatement, callFunction;
 
-procedure ::= PROCEDURE IDEN IS BEGIN procedure END IDEN SEMICOLON 
-			| PROCEDURE IDEN IS BEGIN sequence_of_statements procedure END IDEN SEMICOLON 
+	non terminal 		subprogramDeclaration, subprogramSpecification, declBody, parameterInParenthesis, typeParam, parameterSpecification,  parameterSpecificationP, idSequence,
+						mode, basicDecl, basicDeclItem, numDecl, declareAndAssign;					   
+/* 3. Precedencias */
+
+
+	precedence left MULDIV;
+	precedence left SUMSUBS;
+
+/* 4. Gramaticas con manejo de errores. */
+
+
+	procedure ::= PROCEDURE ID IS BEGIN procedure END ID SEMICOLON
+	            | PROCEDURE ID error:e {:parser.report_error("Unexpected symbol", "Wrong procedure,");:} BEGIN statementsSeguidos procedure END ID SEMICOLON
+	            | PROCEDURE error:e {:parser.report_error("Expected identifier", "Wrong procedure");:} IS BEGIN statementsSeguidos procedure END ID SEMICOLON
+	            | PROCEDURE ID IS error:e {:parser.report_error("Expected begin", "Wrong procedure");:} statementsSeguidos procedure END ID SEMICOLON
+	            | PROCEDURE ID IS BEGIN statementsSeguidos procedure END ID SEMICOLON
+	            | empty;
+
+	subprogramDeclaration ::= subprogramSpecification IS declBody BEGIN statementsSeguidos END ID SEMICOLON
+							 | error:e {:parser.report_error("Error in subprogram declaration", "Wrong declaration");:} IS declBody BEGIN statementsSeguidos END ID SEMICOLON
+							 | subprogramSpecification error:e{:parser.report_error("IS expected", "Wrong declaration");:} declBody BEGIN statementsSeguidos END ID SEMICOLON;
+
+    subprogramSpecification ::= PROCEDURE ID parameterInParenthesis
+    							| error:e{:parser.report_error("Error in subprogram specification", "Wrong declaration");:} ID parameterInParenthesis
+                                | FUNCTION ID parameterInParenthesis error:e{:parser.report_error("Missing return", "Wrong declaration");:} typeParam
+                                | FUNCTION ID parameterInParenthesis RETURN typeParam;
+
+    parameterInParenthesis ::= LPAR parameterSpecification RPAR
+    			   | LPAR parameterSpecification error:e{:parser.report_error("Missing right parenthesis", "Wrong");:}
+    			   | empty;
+
+    parameterSpecification ::= parameterSpecification SEMICOLON parameterSpecificationP  | parameterSpecificationP;
+
+    parameterSpecificationP ::= idSequence COLON mode typeParam;
+
+    idSequence ::= idSequence COMMA ID | ID;
+
+    mode ::= IN | OUT | IN OUT | empty;
+
+    typeParam ::= BOOLEAN | FLOAT | INTEGER;
+
+    declBody ::= basicDeclItem | empty;
+
+    basicDeclItem ::=  basicDeclItem basicDecl |  basicDecl;
+    
+    basicDecl ::= subprogramDeclaration | numDecl;
+
+    numDecl ::= idSequence COLON typeParam declareAndAssign SEMICOLON;
+
+    declareAndAssign ::= ASSIGN expression | empty;
+
+	statementsSeguidos ::= statementsSeguidos statement 
+			| statement;
+
+	statement ::= simpleStatement | statementCompuesto ;
+
+	simpleStatement ::= assignmentStatement
+						| return_statement
+						| exit_statement
+						| callProcedure;
+
+	statementCompuesto ::= ifStatement 
+						| loopStatement;
+
+
+	loopStatement ::= forOrWhile
+					  | forStatement;
+
+	forOrWhile ::= WHILE condition loopBody
+					| error:e{:parser.report_error("Missing While", "Wrong while");:} condition loopBody; 
+
+	loopBody ::= LOOP statementsSeguidos END LOOP SEMICOLON
+	                | LOOP error:e {: parser.report_error("Loop error", "Wrong loop");:} END LOOP SEMICOLON
+	                | LOOP statementsSeguidos error:e {: parser.report_error("Missing end", "Wrong loop");:} LOOP SEMICOLON
+	                | LOOP statementsSeguidos END error:e {: parser.report_error("Missing loop", "Wrong loop");:} SEMICOLON
+	                | error statementsSeguidos END LOOP SEMICOLON;
+
+						
+	ifStatement ::=   IF conditionPart elsif else END IF SEMICOLON              
+	                 | IF conditionPart elsif else END error:e {: parser.report_error("Missing if", "Wrong if statement");:} SEMICOLON;
+
+	elsif ::= elsif ELSIF conditionPart
+			| elsif ELSIF error:e{:parser.report_error("Error in condition", "Wrong elseif");:}
 			| empty;
 
-sequence_of_statements ::= sequence_of_statements statement 
-		| statement;
+	conditionPart ::= condition THEN statementsSeguidos
+					| error:e {: parser.report_error("Error in condition", "Wrong condition");:} THEN statementsSeguidos
+					| condition error:e {: parser.report_error("Missing then", "Wrong condition");:} statementsSeguidos;
 
-statement ::= simple_statement | compound_statement;
+	else ::=  ELSE statementsSeguidos
+			| empty;
 
-simple_statement ::= assignment_statement;
 
-compound_statement ::= if_statement | loop_statement;
+	condition ::= expression;
 
-if_statement ::= IF condition_part elsif else END IF SEMICOLON
-                | error {: parser.report_error("if_statement","WRONG"); :}
-                ;
 
-elsif ::= elsif ELSIF condition_part
-		| empty;
+	assignmentStatement ::= ID ASSIGN expression SEMICOLON
+							| ID ASSIGN error:e {:parser.report_error("Assignment error", "Wrong assignment");:} SEMICOLON
+							| ID error:e {:parser.report_error("Assignment error", "Wrong assignment");:} expression SEMICOLON
+							| error:e {:parser.report_error("Missing identifier", "Wrong assignment");:} ASSIGN expression SEMICOLON
+							| ID ASSIGN expression error:e {:parser.report_error("Missing semicolon", "Wrong assignment");:};
 
-condition_part ::= condition THEN sequence_of_statements;
+	expression ::= expression boolOp relation
+				| error:e {:parser.report_error("Error in expression", "Wrong"); :} boolOp relation
+				| expression boolOp error:e {:parser.report_error("Error in bool operation", "Wrong"); :}
+				| relation;
 
-else ::=  ELSE sequence_of_statements
-		| empty;
+	boolOp ::= AND|OR|XOR;
 
-loop_statement ::= while_or_for;
 
-while_or_for ::= WHILE condition rest_of_loop;
+	relation ::= arithmeticExpression OPREL arithmeticExpression
+				| arithmeticExpression OPREL error:e {:parser.report_error("Error in the arithmetic expression", "Wrong relation"); :}
+				| arithmeticExpression; 
 
-rest_of_loop ::= LOOP sequence_of_statements END LOOP SEMICOLON;
 
-condition ::= expression;
+	arithmeticExpression ::= arithmeticExpression SUMSUBS term
+				| arithmeticExpression SUMSUBS error:e {:parser.report_error("Error in arithmetic expresion", "Wrong expression"); :}
+				| term;
 
-assignment_statement ::= IDEN ASSIGN expression SEMICOLON
-			| IDEN ASSIGN error SEMICOLON {: parser.report_error("assignment_statement","WRONG"); :}
-			;
+	term ::= term MULDIV factor
+			| term MULDIV error:e {:parser.report_error("Expected a factor after mult or div", "Wrong term/factor"); :}
+			| factor ;
 
-expression ::= expression boolean_operator relation
-			| relation;
+	factor ::=  ID
+			  | NUM
+			  | REAL
+			  | LPAR expression RPAR
+	          | LPAR error:e {: parser.report_error("Error in the expression", "Wrong factor");:} RPAR 
+	          | LPAR expression error:e {: parser.report_error("Parenthesis not closed", "Wrong factor in parenthesis");:};
 
-boolean_operator ::= AND|OR|XOR;
+	return_statement ::= RETURN SEMICOLON
+						| RETURN expression SEMICOLON
+						| RETURN error:e {:parser.report_error("Missing return statement", "Wrong return");:} SEMICOLON;
 
-relation ::= arithmetic_expression OPREL arithmetic_expression
-			|arithmetic_expression
-			|arithmetic_expression error arithmetic_expression {: parser.report_error("relation, expected OPREL","WRONG"); :}
-			; 
+	exit_statement ::= EXIT SEMICOLON
+					| EXIT ID SEMICOLON 
+					| EXIT ID WHEN condition SEMICOLON
+					| EXIT error:e{:parser.report_error("Missing identifier", "Wrong exit statement");:} WHEN condition SEMICOLON
+					| EXIT ID error:e{:parser.report_error("Missing when", "Wrong exit statement");:} condition SEMICOLON
+					| EXIT ID WHEN error:e{:parser.report_error("Error in when condition", "Wrong exit statement");:} SEMICOLON;
 
-arithmetic_expression ::= arithmetic_expression SUMSUBS term
-			|term;
+	callProcedure ::= ID SEMICOLON
+								| ID parameterCall SEMICOLON;
 
-term ::= term MULDIV factor
-		|factor
-		;
+	parameterCall ::= LPAR parameterList RPAR
+							| LPAR parameterList error:e{:parser.report_error("Missing right parenthesis", "Wrong parameter");:};
 
-factor ::=  IDEN
-		  | NUM
-		  | REAL
-		  | LPAR arithmetic_expression RPAR
-		  ;
+	
+	parameterList ::= parameterList COMMA parameter
+							| parameterList error:e{:parser.report_error("Missing comma", "Wrong parameter");:} parameter
+							| parameter;
 
-empty ::= /* nothing */;
+	parameter ::= ID PARAMASSIGN expression 
+				| expression;
+
+	callFunction ::= ID parameterCall;
+
+	forStatement ::= FOR ID IN expression DOTDOT expression LOOP statementsSeguidos END LOOP SEMICOLON
+					| FOR ID error:e{:parser.report_error("Expected In", "Wrong for statement");:} expression DOTDOT expression LOOP statementsSeguidos END LOOP SEMICOLON 
+					| FOR ID IN error:e{:parser.report_error("Error in expression", "Wrong for statement");:} DOTDOT expression LOOP statementsSeguidos END LOOP SEMICOLON 
+					| FOR ID IN expression error:e{:parser.report_error("Missing ellipsis", "Wrong for statement");:} expression LOOP statementsSeguidos END LOOP SEMICOLON 
+					| FOR ID IN expression DOTDOT error:e{:parser.report_error("Error in expression", "Wrong for statement");:} LOOP statementsSeguidos END LOOP SEMICOLON 
+					| FOR ID IN expression DOTDOT expression error:e{:parser.report_error("Missing loop statement", "Wrong for statement");:} statementsSeguidos END LOOP SEMICOLON 
+					| FOR ID IN expression DOTDOT expression LOOP statementsSeguidos error:e{:parser.report_error("Missing end", "Wrong for statement");:} LOOP SEMICOLON 
+					| FOR ID IN expression DOTDOT expression LOOP statementsSeguidos END error:e{:parser.report_error("Missing loop", "Wrong for statement");:} SEMICOLON; 
+
+	empty ::= /* epsilon! */;
